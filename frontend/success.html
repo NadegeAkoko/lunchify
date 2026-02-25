@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Paiement réussi - Lunchify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    background:linear-gradient(135deg,#fff7ed,#fef3c7);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.card{
+    background:white;
+    padding:50px;
+    border-radius:25px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    max-width:400px;
+    animation:fadeIn 0.6s ease;
+}
+
+.check{
+    font-size:70px;
+    color:#10b981;
+    animation:pop 0.4s ease;
+}
+
+h1{
+    margin-top:20px;
+    font-size:24px;
+}
+
+p{
+    color:#6b7280;
+    margin:15px 0 25px 0;
+}
+
+button{
+    padding:15px 25px;
+    border:none;
+    border-radius:14px;
+    background:#ff7a00;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#e56f00;
+    transform:translateY(-2px);
+}
+
+@keyframes pop{
+    0%{transform:scale(0);}
+    100%{transform:scale(1);}
+}
+
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="check">✅</div>
+    <h1>Paiement réussi !</h1>
+    <p>Merci pour votre commande 🎉<br>
+    Votre repas arrive bientôt.</p>
+
+    <button onclick="window.location.href='products.html'">
+        Retour aux produits
+    </button>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Checkout - Lunchify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+/* ===== BACKGROUND ===== */
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    min-height:100vh;
+    position:relative;
+}
+
+/* Image floutée stylée */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
+        url("https://images.unsplash.com/photo-1556740749-887f6717d7e4");
+    background-size:cover;
+    background-position:center;
+    filter:blur(6px);
+    z-index:-1;
+}
+
+/* ===== BACK BUTTON ===== */
+
+.back-button{
+    position:fixed;
+    top:25px;
+    left:40px;
+    background:white;
+    padding:10px 20px;
+    border-radius:30px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    cursor:pointer;
+    font-weight:500;
+    transition:0.3s;
+    z-index:100;
+}
+
+.back-button:hover{
+    transform:translateY(-2px);
+}
+
+/* ===== LAYOUT ===== */
+
+.wrapper{
+    max-width:1200px;
+    margin:100px auto;
+    display:flex;
+    gap:40px;
+    padding:0 20px;
+}
+
+/* LEFT / RIGHT */
+.left{ flex:2; }
+.right{ flex:1; }
+
+/* ===== CARD STYLE ===== */
+
+.card{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+h3{
+    margin-top:0;
+    margin-bottom:20px;
+}
+
+/* INPUT */
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:14px;
+}
+
+/* ===== DELIVERY OPTIONS ===== */
+
+.option-box{
+    border:1.5px solid #ddd;
+    padding:18px;
+    border-radius:15px;
+    margin-top:12px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.option-box.active{
+    border:2px solid black;
+    background:#f9fafb;
+}
+
+/* ===== PAYMENT METHODS ===== */
+
+.payment-method{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    border:1.5px solid #ddd;
+    border-radius:12px;
+    margin-top:12px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.payment-method.selected{
+    border:2px solid black;
+    background:#f9fafb;
+}
+
+/* ===== SUMMARY ===== */
+
+.summary-line{
+    display:flex;
+    justify-content:space-between;
+    margin:12px 0;
+    font-size:14px;
+}
+
+.total{
+    font-weight:700;
+    font-size:18px;
+}
+
+/* BLACK UBER STYLE BUTTON */
+
+.checkout-btn{
+    width:100%;
+    padding:16px;
+    background:black;
+    color:white;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    margin-top:25px;
+    transition:0.3s;
+}
+
+.checkout-btn:hover{
+    background:#111;
+    transform:translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+    .wrapper{
+        flex-direction:column;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="back-button" onclick="goBack()">
+    ← Retour à l'établissement
+</div>
+
+<div class="wrapper">
+
+<!-- LEFT COLUMN -->
+<div class="left">
+
+    <div class="card">
+        <h3>Détails de la livraison</h3>
+        <input id="address" placeholder="24 Rue Lamartine">
+        <input id="phone" placeholder="Téléphone">
+
+        <h3 style="margin-top:30px;">Options de livraison</h3>
+
+        <div class="option-box active" onclick="selectDelivery('standard')" id="standard">
+            🚚 Standard (30-40 min) - Gratuit
+        </div>
+
+        <div class="option-box" onclick="selectDelivery('priority')" id="priority">
+            ⚡ Priorité (20-25 min) - 1.99 €
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Moyen de paiement</h3>
+
+        <div class="payment-method" onclick="selectPayment('Visa')" id="Visa">
+            💳 Visa
+        </div>
+
+        <div class="payment-method" onclick="selectPayment('MasterCard')" id="MasterCard">
+            💳 MasterCard
+        </div>
+
+        <div class="payment-method" onclick="selectPayment('American Express')" id="American Express">
+            💳 American Express
+        </div>
+
+        <input id="cardNumber" placeholder="Numéro de carte">
+        <input id="expiry" placeholder="MM/AA">
+        <input id="cvv" placeholder="CVV">
+    </div>
+
+</div>
+
+<!-- RIGHT COLUMN -->
+<div class="right">
+
+    <div class="card">
+        <h3>Récapitulatif du panier</h3>
+
+        <div id="summary"></div>
+
+        <div class="summary-line">
+            <span>Sous-total</span>
+            <span id="subtotal"></span>
+        </div>
+
+        <div class="summary-line">
+            <span>Livraison</span>
+            <span id="deliveryFee"></span>
+        </div>
+
+        <hr>
+
+        <div class="summary-line total">
+            <span>Total</span>
+            <span id="total"></span>
+        </div>
+
+        <button class="checkout-btn" onclick="pay()">
+            Commander et payer
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+let deliveryType = "standard";
+let paymentType = "";
+
+/* BACK */
+function goBack(){
+    window.history.back();
+}
+
+/* DELIVERY */
+function selectDelivery(type){
+    deliveryType = type;
+    document.querySelectorAll(".option-box").forEach(el=>el.classList.remove("active"));
+    document.getElementById(type).classList.add("active");
+    loadSummary();
+}
+
+/* PAYMENT */
+function selectPayment(type){
+    paymentType = type;
+    document.querySelectorAll(".payment-method").forEach(el=>el.classList.remove("selected"));
+    document.getElementById(type).classList.add("selected");
+}
+
+/* SUMMARY */
+function loadSummary(){
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const summary = document.getElementById("summary");
+
+    summary.innerHTML = "";
+    let subtotal = 0;
+
+    cart.forEach(item=>{
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+
+        summary.innerHTML += `
+            <div class="summary-line">
+                <span>${item.name} x${item.quantity}</span>
+                <span>${itemTotal.toFixed(2)} €</span>
+            </div>
+        `;
+    });
+
+    let deliveryFee = deliveryType === "priority" ? 1.99 : 0;
+
+    document.getElementById("subtotal").innerText = subtotal.toFixed(2) + " €";
+    document.getElementById("deliveryFee").innerText = deliveryFee.toFixed(2) + " €";
+    document.getElementById("total").innerText = (subtotal + deliveryFee).toFixed(2) + " €";
+}
+
+/* PAYMENT */
+async function pay(){
+
+    const address = document.getElementById("address").value;
+    const phone = document.getElementById("phone").value;
+    const cardNumber = document.getElementById("cardNumber").value;
+    const expiry = document.getElementById("expiry").value;
+    const cvv = document.getElementById("cvv").value;
+
+    if(!address || !phone || !paymentType || !cardNumber || !expiry || !cvv){
+        alert("Veuillez remplir toutes les informations.");
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let subtotal = 0;
+    cart.forEach(item=> subtotal += item.price * item.quantity);
+
+    let deliveryFee = deliveryType === "priority" ? 1.99 : 0;
+    let total = subtotal + deliveryFee;
+
+    const response = await fetch("http://127.0.0.1:8000/payment/checkout",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            address,
+            phone,
+            total,
+            payment_method: paymentType,
+            card_number: cardNumber,
+            expiry,
+            cvv,
+            items: cart
+        })
+    });
+
+    const data = await response.json();
+    alert(data.message);
+
+    localStorage.removeItem("cart");
+    window.location.href="success.html";
+}
+
+loadSummary();
+
+</script>
+
+</body>
+</html>

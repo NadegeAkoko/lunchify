@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Restaurants</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.restaurant-card img {
+    width:100%;
+    border-radius:12px;
+    height:150px;
+    object-fit:cover;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🍽 Lunchify</div>
+</header>
+
+<div class="container">
+    <h1>Restaurants disponibles</h1>
+    <div class="cards" id="restaurantList"></div>
+</div>
+
+<script>
+async function loadRestaurants() {
+    const res = await fetch("http://127.0.0.1:8000/restaurants");
+    const restaurants = await res.json();
+
+    const container = document.getElementById("restaurantList");
+    container.innerHTML="";
+
+    restaurants.forEach(r => {
+        const card = document.createElement("div");
+        card.className="card restaurant-card";
+        card.innerHTML=`
+            <img src="${r.image_url}">
+            <h3>${r.name}</h3>
+            <p>${r.description}</p>
+            <button onclick="viewMenu(${r.id})">
+                Voir le menu
+            </button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function viewMenu(id){
+    localStorage.setItem("restaurant_id", id);
+    window.location.href="products.html";
+}
+
+loadRestaurants();
+</script>
+
+</body>
+</html>

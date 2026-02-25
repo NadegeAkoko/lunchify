@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Détail Produit - Lunchify</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    background:#f4f6f9;
+}
+
+/* ===== HEADER ===== */
+.header{
+    position:sticky;
+    top:0;
+    background:white;
+    padding:18px 25px;
+    font-weight:700;
+    font-size:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.05);
+    z-index:100;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+/* 🔥 BOUTON RETOUR */
+.back-btn{
+    background:#f97316;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:14px;
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    background:#ea580c;
+    transform:translateX(-3px);
+}
+
+/* ===== HERO IMAGE ===== */
+.hero{
+    position:relative;
+}
+
+.hero img{
+    width:100%;
+    height:350px;
+    object-fit:cover;
+    border-bottom-left-radius:30px;
+    border-bottom-right-radius:30px;
+    cursor:pointer;
+}
+
+.gradient{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:120px;
+    background:linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+
+/* ===== CONTENT ===== */
+.container{
+    max-width:750px;
+    margin:-80px auto 120px auto;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(10px);
+    border-radius:30px;
+    padding:35px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.12);
+    animation:slideUp 0.6s ease;
+}
+
+@keyframes slideUp{
+    from{opacity:0; transform:translateY(40px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.price{
+    font-size:26px;
+    font-weight:700;
+    color:#f97316;
+}
+
+.badges{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:15px 0;
+}
+
+.badge{
+    background:#f3f4f6;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:13px;
+}
+
+.section{
+    margin-top:30px;
+}
+
+.review{
+    background:#f9fafb;
+    padding:15px;
+    border-radius:15px;
+    margin-top:10px;
+}
+
+.quantity-control{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    margin-top:20px;
+}
+
+.quantity-control button{
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:#f97316;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+/* ===== FLOATING CART ===== */
+.floating-cart{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:white;
+    padding:20px;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.1);
+}
+
+.floating-cart button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:15px;
+    background:#f97316;
+    color:white;
+    font-weight:600;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.floating-cart button:hover{
+    background:#ea580c;
+}
+
+/* IMAGE MODAL */
+#imageModal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    justify-content:center;
+    align-items:center;
+}
+
+#modalImg{
+    max-width:90%;
+    max-height:90%;
+    border-radius:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <button class="back-btn" onclick="goBack()">← Retour</button>
+    🍽 Lunchify
+</div>
+
+<div class="hero">
+    <img id="heroImg">
+    <div class="gradient"></div>
+</div>
+
+<div class="container" id="productDetail"></div>
+
+<div class="floating-cart">
+    <button id="cartBtn"></button>
+</div>
+
+<div id="imageModal" onclick="closeImage()">
+    <img id="modalImg">
+</div>
+
+<script>
+
+function goBack(){
+    window.history.back();
+}
+
+const productId = localStorage.getItem("selected_product");
+let quantity = 1;
+let currentProduct = null;
+
+function generateFoodData(name){
+    const lower = name.toLowerCase();
+
+    if(lower.includes("riz")){
+        return {
+            kcal: "650 kcal",
+            ingredients: "Riz jasmin parfumé, crevettes fraîches, légumes croquants sautés au wok.",
+            review: "Très parfumé et généreux en crevettes !"
+        }
+    }
+
+    if(lower.includes("burger")){
+        return {
+            kcal: "950 kcal",
+            ingredients: "Pain brioché, steak grillé, cheddar fondant, sauce maison.",
+            review: "Burger ultra juteux, viande parfaitement cuite."
+        }
+    }
+
+    if(lower.includes("pizza")){
+        return {
+            kcal: "1100 kcal",
+            ingredients: "Pâte artisanale, mozzarella fraîche, sauce tomate maison.",
+            review: "Pâte croustillante et ingrédients premium."
+        }
+    }
+
+    return {
+        kcal: "700 kcal",
+        ingredients: "Ingrédients frais soigneusement sélectionnés.",
+        review: "Délicieux et bien préparé."
+    }
+}
+
+async function loadProduct(){
+
+    const res = await fetch(`http://127.0.0.1:8000/products/${productId}`);
+    const product = await res.json();
+    currentProduct = product;
+
+    const foodData = generateFoodData(product.name);
+
+    document.getElementById("heroImg").src = product.image_url;
+    document.getElementById("heroImg").onclick = () => openImage(product.image_url);
+
+    const container = document.getElementById("productDetail");
+
+    container.innerHTML = `
+        <h2>${product.name}</h2>
+        <div class="price">${product.price} €</div>
+
+        <div class="badges">
+            <div class="badge">🚚 Livraison 25-35 min</div>
+            <div class="badge">🔥 Populaire</div>
+            <div class="badge">🥗 ${foodData.kcal}</div>
+        </div>
+
+        <p>${product.description}</p>
+
+        <div class="section">
+            <h3>Ingrédients</h3>
+            <p style="color:#666; font-size:14px;">
+                ${foodData.ingredients}
+            </p>
+        </div>
+
+        <div class="quantity-control">
+            <button onclick="decrease()">-</button>
+            <span id="qty">${quantity}</span>
+            <button onclick="increase()">+</button>
+        </div>
+
+        <div class="section">
+            <h3>Avis client</h3>
+            <div class="review">
+                ⭐⭐⭐⭐⭐  
+                <p style="margin:5px 0; font-size:14px;">
+                ${foodData.review}
+                </p>
+            </div>
+        </div>
+    `;
+
+    updateButton();
+}
+
+function openImage(src){
+    document.getElementById("modalImg").src = src;
+    document.getElementById("imageModal").style.display = "flex";
+}
+
+function closeImage(){
+    document.getElementById("imageModal").style.display = "none";
+}
+
+function increase(){
+    quantity++;
+    document.getElementById("qty").innerText = quantity;
+    updateButton();
+}
+
+function decrease(){
+    if(quantity > 1){
+        quantity--;
+        document.getElementById("qty").innerText = quantity;
+        updateButton();
+    }
+}
+
+function updateButton(){
+    document.getElementById("cartBtn").innerText =
+        `Ajouter au panier • ${(currentProduct.price * quantity).toFixed(2)} €`;
+}
+
+function addToCart(){
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const existing = cart.find(item => item.id === currentProduct.id);
+
+    if(existing){
+        existing.quantity += quantity;
+    } else {
+        cart.push({
+            id: currentProduct.id,
+            name: currentProduct.name,
+            price: currentProduct.price,
+            quantity: quantity,
+            image: currentProduct.image_url
+        });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("Produit ajouté au panier !");
+}
+
+document.getElementById("cartBtn").onclick = addToCart;
+
+loadProduct();
+
+</script>
+
+</body>
+</html>
