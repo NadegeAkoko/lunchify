@@ -107,7 +107,7 @@ async function login() {
         localStorage.setItem("token", data.access_token);
 
         // récupérer le profil utilisateur
-        const meResponse = await fetch("http://127.0.0.1:8000/me", {
+        const meResponse = await fetch("https://lunchify-backend.onrender.com/me", {
             headers: {
                 "Authorization": "Bearer " + data.access_token
             }
