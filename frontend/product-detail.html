@@ -249,7 +249,7 @@ function generateFoodData(name){
 
 async function loadProduct(){
 
-    const res = await fetch(`http://127.0.0.1:8000/products/${productId}`);
+    const res = await fetch(`https://lunchify-backend.onrender.com/products/${productId}`);
     const product = await res.json();
     currentProduct = product;
 
